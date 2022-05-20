@@ -27,8 +27,7 @@ public class Enigma {
 				forward = true;
 			}
 			String[] splitted = input.substring(3).split("");
-			System.out.println(Arrays.toString(splitted));
-//input checker
+			// input checker
 			if (input.charAt(1) == 'C') {
 				int increment = 1;
 				if (Character.isDigit(input.charAt(2))) {
@@ -54,7 +53,6 @@ public class Enigma {
 
 	public static String caeserCipher(String[] input, boolean forward, int increment) {
 		// checks if the input is an advanced caesar cipher
-		System.out.println(increment);
 		String result = "";
 		for (String s : input) {
 			char letter = s.toUpperCase().charAt(0);
@@ -82,9 +80,15 @@ public class Enigma {
 	}
 
 	public static String rotorCipher(String[] input, boolean forward) {
-		String cipher1 = affineCipher(input, forward, ALPHABET, ROTOR_ONE);
-		String cipher2 = affineCipher(cipher1.split(""), forward, ALPHABET, ROTOR_TWO);
-		return affineCipher(cipher2.split(""), forward, ALPHABET, ROTOR_THREE);
+		if (forward) {
+			String cipher1 = affineCipher(input, forward, ALPHABET, ROTOR_ONE);
+			String cipher2 = affineCipher(cipher1.split(""), forward, ALPHABET, ROTOR_TWO);
+			return affineCipher(cipher2.split(""), forward, ALPHABET, ROTOR_THREE);
+		} else {
+			String cipher1 = affineCipher(input, forward, ALPHABET, ROTOR_THREE);
+			String cipher2 = affineCipher(cipher1.split(""), forward, ALPHABET, ROTOR_TWO);
+			return affineCipher(cipher2.split(""), forward, ALPHABET, ROTOR_ONE);
+		}
 	}
 
 	public static String affineCipher(String[] input, boolean forward, String rotorIn, String rotorOut) {
