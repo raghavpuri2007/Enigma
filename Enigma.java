@@ -10,6 +10,8 @@ public class Enigma {
 	public static final String ROTOR_ONE = "EKMFLGDQVZNTOWYHXUSPAIBRCJ";
 	public static final String ROTOR_TWO = "AJDKSIRUXBLHWTMCQGZNPYFVOE";
 	public static final String ROTOR_THREE = "BDFHJLCPRTXVZNYEIWGAKMUSQO";
+	public static final String ROTOR_FOUR = "ESOVPZJAYQUIRHXLNFTGKDCMWB";
+	public static final String ROTOR_FIVE = "VZBRGITYUPSDNHLXAWMJQOFECK";
 
 	public static void main(String[] args) {
 		processCommand();
@@ -23,10 +25,17 @@ public class Enigma {
 			String result = "";
 			System.out.print("Input: ");
 			String input = userInput.nextLine();
+			String[] splitted = {};
 			if (input.charAt(0) == '>') {
 				forward = true;
 			}
-			String[] splitted = input.substring(3).split("");
+			if (input.length() > 3) {
+				splitted = input.substring(3).split("");
+			} else {
+				System.out.println("I don't understand, please enter valid input\n");
+				continue;
+			}
+
 			// input checker
 			if (input.charAt(1) == 'C') {
 				int increment = 1;
@@ -36,23 +45,26 @@ public class Enigma {
 				}
 				result = caeserCipher(splitted, forward, increment);
 			} else if (input.charAt(1) == 'A') {
-				result = affineCipher(splitted, forward, ALPHABET, ROTOR_ONE);
+				result = affineCipher(splitted, forward, ALPHABET, ROTOR_ONE, 0);
 			} else if (input.charAt(1) == 'R') {
 				result = rotorCipher(splitted, forward);
 			} else if (input.equalsIgnoreCase("help")) {
-				result = "help menu";
+				result = "help menu\n";
 			} else if (input.equalsIgnoreCase("quit")) {
-				result = "Thank you for using Enigma. Have a good day!";
+				result = "Thank you for using Enigma. Have a good day!\n";
 				quit = true;
+			} else if (input.charAt(0) == 'I' || input.charAt(0) == 'V') {
+				splitted = input.split(" ");
+				result = "";
+				new EnigmaMachine(splitted);
 			} else {
-				result = "I don't understand, please enter valid input";
+				result = "I don't understand, please enter valid input\n";
 			}
 			System.out.println(result);
 		}
 	}
 
 	public static String caeserCipher(String[] input, boolean forward, int increment) {
-		// checks if the input is an advanced caesar cipher
 		String result = "";
 		for (String s : input) {
 			char letter = s.toUpperCase().charAt(0);
@@ -61,6 +73,7 @@ public class Enigma {
 			} else if (!Character.isLetter(letter)) {
 				return s + " is not a letter. Please enter valid input";
 			} else {
+				// increment = increment % 26;
 				if (forward) {
 					if (letter + increment > 90) {
 						result += (char) (64 + increment - (90 - letter));
@@ -81,30 +94,32 @@ public class Enigma {
 
 	public static String rotorCipher(String[] input, boolean forward) {
 		if (forward) {
-			String cipher1 = affineCipher(input, forward, ALPHABET, ROTOR_ONE);
-			String cipher2 = affineCipher(cipher1.split(""), forward, ALPHABET, ROTOR_TWO);
-			return affineCipher(cipher2.split(""), forward, ALPHABET, ROTOR_THREE);
+			String cipher1 = affineCipher(input, forward, ALPHABET, ROTOR_ONE, 0);
+			String cipher2 = affineCipher(cipher1.split(""), forward, ALPHABET, ROTOR_TWO, 0);
+			return affineCipher(cipher2.split(""), forward, ALPHABET, ROTOR_THREE, 0);
 		} else {
-			String cipher1 = affineCipher(input, forward, ALPHABET, ROTOR_THREE);
-			String cipher2 = affineCipher(cipher1.split(""), forward, ALPHABET, ROTOR_TWO);
-			return affineCipher(cipher2.split(""), forward, ALPHABET, ROTOR_ONE);
+			String cipher1 = affineCipher(input, forward, ALPHABET, ROTOR_THREE, 0);
+			String cipher2 = affineCipher(cipher1.split(""), forward, ALPHABET, ROTOR_TWO, 0);
+			return affineCipher(cipher2.split(""), forward, ALPHABET, ROTOR_ONE, 0);
 		}
 	}
 
-	public static String affineCipher(String[] input, boolean forward, String rotorIn, String rotorOut) {
+	public static String affineCipher(String[] input, boolean forward, String rotorIn, String rotorOut, int shift) {
 		String result = "";
 		int index = 0;
 		for (String s : input) {
 			if (s.equals(" ")) {
 				result += " ";
 			} else {
+				s = caeserCipher((s.charAt(0) + "").split(" "), true, shift);
 				if (forward) {
 					// in
-					index = rotorIn.indexOf(s);
-					result += rotorOut.charAt(index);
+					index = (rotorIn.indexOf(s));
+					// result += (char) (rotorOut.charAt(index) - shift) + "";
+					result += caeserCipher((rotorOut.charAt(index) + "").split(" "), false, shift);
 				} else {
 					// out
-					index = rotorOut.indexOf(s);
+					index = (rotorOut.indexOf(s));
 					result += rotorIn.charAt(index);
 				}
 			}
