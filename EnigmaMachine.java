@@ -1,3 +1,7 @@
+
+//Raghav Puri
+//Ap Computer Science A
+//Enigma
 import java.util.ArrayList;
 
 public class EnigmaMachine {
@@ -56,6 +60,10 @@ public class EnigmaMachine {
 		}
 		// Step 2
 		for (int i = 0; i < output.length(); i++) {
+			/*
+			 * Comment out the if(notched) statement to work for the Notch Position Test
+			 * Cases (below is double stepping)
+			 */
 			if (notched) {
 				middleShift = Enigma.caeserCipher((middleShift + "").split(""), true, 1).charAt(0);
 				notched = false;
@@ -79,7 +87,16 @@ public class EnigmaMachine {
 		for (int i = 0; i < input.length(); i++) {
 			output = output.substring(0, i) + plugboardSwitch(output.charAt(i) + "") + output.substring(i + 1);
 		}
-		System.out.println(output);
+		for (int i = 0; i < output.length(); i++) {
+			try {
+				Thread.sleep(200);
+				System.out.print(output.charAt(i));
+			} catch (InterruptedException ie) {
+				System.out.println("Exception arised");
+			}
+		}
+		// Creates new line, since I used .print() and not .println() above
+		System.out.println();
 
 	}
 
@@ -105,7 +122,6 @@ public class EnigmaMachine {
 		boolean rotorThree = rotor.equals(ROTOR_THREE) && shift == 'W';
 		boolean rotorFour = rotor.equals(ROTOR_FOUR) && shift == 'K';
 		boolean rotorFive = rotor.equals(ROTOR_FIVE) && shift == 'A';
-		System.out.println("Left: " + leftShift + ", Middle: " + middleShift + ", Right: " + rightShift);
 		if (rotorOne || rotorTwo || rotorThree || rotorFour || rotorFive) {
 			if (rotor.equals(rightRotor)) {
 				middleShift = Enigma.caeserCipher((middleShift + "").split(""), true, 1).charAt(0);
