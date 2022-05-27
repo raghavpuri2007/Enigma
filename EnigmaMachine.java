@@ -11,20 +11,22 @@ public class EnigmaMachine {
 	String leftRotor;
 	String middleRotor;
 	String rightRotor;
-	String leftShift;
-	String middleShift;
-	String rightShift;
+	char leftShift;
+	char middleShift;
+	char rightShift;
 	ArrayList<String> plugboardSettings;
 	String input = "";
 	String output = "";
+	boolean notched = false;
+	boolean shifted = false;
 
 	public EnigmaMachine(String[] inputSplit) {
 		leftRotor = rotorConvertor(inputSplit[0]);
 		middleRotor = rotorConvertor(inputSplit[1]);
 		rightRotor = rotorConvertor(inputSplit[2]);
-		leftShift = inputSplit[3];
-		middleShift = inputSplit[4];
-		rightShift = inputSplit[5] + 1;
+		leftShift = inputSplit[3].charAt(0);
+		middleShift = inputSplit[4].charAt(0);
+		rightShift = inputSplit[5].charAt(0);
 		plugboardSettings = new ArrayList<>();
 		for (int i = 6; i < inputSplit.length - 1; i++) {
 			plugboardSettings.add(inputSplit[i]);
@@ -52,20 +54,27 @@ public class EnigmaMachine {
 		for (int i = 0; i < input.length(); i++) {
 			output += plugboardSwitch(input.charAt(i) + "");
 		}
-		System.out.println(output);
 		// Step 2
-		output = Enigma.affineCipher(output.split(""), true, ALPHABET, rightRotor, (int) (rightShift.charAt(0)) - 64);
-		System.out.println(output);
-		output = Enigma.affineCipher(output.split(""), true, ALPHABET, middleRotor, (int) (middleShift.charAt(0) - 65));
-		System.out.println(output);
-		output = Enigma.affineCipher(output.split(""), true, ALPHABET, leftRotor, (int) (leftShift.charAt(0) - 65));
-
-		// Step 3
-		output = Enigma.affineCipher(output.split(""), true, ALPHABET, REFLECTOR, 0);
-		// Step 4
-		output = Enigma.affineCipher(output.split(""), true, leftRotor, ALPHABET, (int) (leftShift.charAt(0)) - 65);
-		output = Enigma.affineCipher(output.split(""), true, middleRotor, ALPHABET, (int) (middleShift.charAt(0) - 65));
-		output = Enigma.affineCipher(output.split(""), true, rightRotor, ALPHABET, (int) (rightShift.charAt(0) - 64));
+		for (int i = 0; i < output.length(); i++) {
+			if (notched) {
+				middleShift = Enigma.caeserCipher((middleShift + "").split(""), true, 1).charAt(0);
+				notched = false;
+			}
+			rightShift = Enigma.caeserCipher((rightShift + "").split(""), true, 1).charAt(0);
+			checkNotch(rightRotor, rightShift);
+			checkNotch(middleRotor, middleShift);
+			String current = output.charAt(i) + "";
+			current = Enigma.affineCipher(current.split(""), true, ALPHABET, rightRotor, (int) (rightShift - 65));
+			current = Enigma.affineCipher(current.split(""), true, ALPHABET, middleRotor, (int) (middleShift - 65));
+			current = Enigma.affineCipher(current.split(""), true, ALPHABET, leftRotor, (int) (leftShift - 65));
+			// Step 3
+			current = Enigma.affineCipher(current.split(""), true, ALPHABET, REFLECTOR, 0);
+			// Step 4
+			current = Enigma.affineCipher(current.split(""), true, leftRotor, ALPHABET, (int) (leftShift - 65));
+			current = Enigma.affineCipher(current.split(""), true, middleRotor, ALPHABET, (int) (middleShift - 65));
+			current = Enigma.affineCipher(current.split(""), true, rightRotor, ALPHABET, (int) (rightShift - 65));
+			output = output.substring(0, i) + current + output.substring(i + 1);
+		}
 		// Step 5
 		for (int i = 0; i < input.length(); i++) {
 			output = output.substring(0, i) + plugboardSwitch(output.charAt(i) + "") + output.substring(i + 1);
@@ -87,6 +96,26 @@ public class EnigmaMachine {
 			return ROTOR_FIVE;
 		} else {
 			return str;
+		}
+	}
+
+	public void checkNotch(String rotor, char shift) {
+		boolean rotorOne = rotor.equals(ROTOR_ONE) && shift == 'R';
+		boolean rotorTwo = rotor.equals(ROTOR_TWO) && shift == 'F';
+		boolean rotorThree = rotor.equals(ROTOR_THREE) && shift == 'W';
+		boolean rotorFour = rotor.equals(ROTOR_FOUR) && shift == 'K';
+		boolean rotorFive = rotor.equals(ROTOR_FIVE) && shift == 'A';
+		System.out.println("Left: " + leftShift + ", Middle: " + middleShift + ", Right: " + rightShift);
+		if (rotorOne || rotorTwo || rotorThree || rotorFour || rotorFive) {
+			if (rotor.equals(rightRotor)) {
+				middleShift = Enigma.caeserCipher((middleShift + "").split(""), true, 1).charAt(0);
+				notched = true;
+			} else {
+				if (!shifted) {
+					leftShift = Enigma.caeserCipher((leftShift + "").split(""), true, 1).charAt(0);
+					shifted = true;
+				}
+			}
 		}
 	}
 }
