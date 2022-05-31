@@ -6,12 +6,6 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Enigma {
-	public static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	public static final String ROTOR_ONE = "EKMFLGDQVZNTOWYHXUSPAIBRCJ";
-	public static final String ROTOR_TWO = "AJDKSIRUXBLHWTMCQGZNPYFVOE";
-	public static final String ROTOR_THREE = "BDFHJLCPRTXVZNYEIWGAKMUSQO";
-	public static final String ROTOR_FOUR = "ESOVPZJAYQUIRHXLNFTGKDCMWB";
-	public static final String ROTOR_FIVE = "VZBRGITYUPSDNHLXAWMJQOFECK";
 
 	public static void main(String[] args) {
 		processCommand();
@@ -45,7 +39,7 @@ public class Enigma {
 				}
 				result = caeserCipher(splitted, forward, increment);
 			} else if (input.charAt(1) == 'A') {
-				result = affineCipher(splitted, forward, ALPHABET, ROTOR_ONE, 0);
+				result = affineCipher(splitted, forward, EnigmaMachine.ALPHABET, EnigmaMachine.ROTOR_ONE, 0);
 			} else if (input.charAt(1) == 'R') {
 				result = rotorCipher(splitted, forward);
 			} else if (input.equalsIgnoreCase("help")) {
@@ -94,13 +88,15 @@ public class Enigma {
 
 	public static String rotorCipher(String[] input, boolean forward) {
 		if (forward) {
-			String cipher1 = affineCipher(input, forward, ALPHABET, ROTOR_ONE, 0);
-			String cipher2 = affineCipher(cipher1.split(""), forward, ALPHABET, ROTOR_TWO, 0);
-			return affineCipher(cipher2.split(""), forward, ALPHABET, ROTOR_THREE, 0);
+			String cipher1 = affineCipher(input, forward, EnigmaMachine.ALPHABET, EnigmaMachine.ROTOR_ONE, 0);
+			String cipher2 = affineCipher(cipher1.split(""), forward, EnigmaMachine.ALPHABET, EnigmaMachine.ROTOR_TWO,
+					0);
+			return affineCipher(cipher2.split(""), forward, EnigmaMachine.ALPHABET, EnigmaMachine.ROTOR_THREE, 0);
 		} else {
-			String cipher1 = affineCipher(input, forward, ALPHABET, ROTOR_THREE, 0);
-			String cipher2 = affineCipher(cipher1.split(""), forward, ALPHABET, ROTOR_TWO, 0);
-			return affineCipher(cipher2.split(""), forward, ALPHABET, ROTOR_ONE, 0);
+			String cipher1 = affineCipher(input, forward, EnigmaMachine.ALPHABET, EnigmaMachine.ROTOR_THREE, 0);
+			String cipher2 = affineCipher(cipher1.split(""), forward, EnigmaMachine.ALPHABET, EnigmaMachine.ROTOR_TWO,
+					0);
+			return affineCipher(cipher2.split(""), forward, EnigmaMachine.ALPHABET, EnigmaMachine.ROTOR_ONE, 0);
 		}
 	}
 
