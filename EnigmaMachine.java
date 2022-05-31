@@ -20,11 +20,13 @@ public class EnigmaMachine {
 	char rightShift;
 	ArrayList<String> plugboardSettings;
 	String input = "";
-	String output = "";
+	private String output = "";
 	boolean notched = false;
 	boolean shifted = false;
+	private String[] inputSplit;
 
 	public EnigmaMachine(String[] inputSplit) {
+		this.inputSplit = inputSplit;
 		leftRotor = rotorConvertor(inputSplit[0]);
 		middleRotor = rotorConvertor(inputSplit[1]);
 		rightRotor = rotorConvertor(inputSplit[2]);
@@ -64,10 +66,10 @@ public class EnigmaMachine {
 			 * Comment out the if(notched) statement to work for the Notch Position Test
 			 * Cases (below is double stepping)
 			 */
-			if (notched) {
-				middleShift = Enigma.caeserCipher((middleShift + "").split(""), true, 1).charAt(0);
-				notched = false;
-			}
+//			if (notched) {
+//				middleShift = Enigma.caeserCipher((middleShift + "").split(""), true, 1).charAt(0);
+//				notched = false;
+//			}
 			rightShift = Enigma.caeserCipher((rightShift + "").split(""), true, 1).charAt(0);
 			checkNotch(rightRotor, rightShift);
 			checkNotch(middleRotor, middleShift);
@@ -88,15 +90,10 @@ public class EnigmaMachine {
 			output = output.substring(0, i) + plugboardSwitch(output.charAt(i) + "") + output.substring(i + 1);
 		}
 		for (int i = 0; i < output.length(); i++) {
-			try {
-				Thread.sleep(200);
-				System.out.print(output.charAt(i));
-			} catch (InterruptedException ie) {
-				System.out.println("Exception arised");
-			}
+			// Thread.sleep(200);
+			System.out.print(output.charAt(i));
 		}
 		// Creates new line, since I used .print() and not .println() above
-		System.out.println();
 
 	}
 
@@ -133,5 +130,13 @@ public class EnigmaMachine {
 				}
 			}
 		}
+	}
+
+	public String[] getInputSplit() {
+		return this.inputSplit;
+	}
+
+	public String getOutput() {
+		return this.output;
 	}
 }
